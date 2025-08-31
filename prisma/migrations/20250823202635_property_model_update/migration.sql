@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "public"."Property" ALTER COLUMN "rooms" SET DATA TYPE TEXT,
+ALTER COLUMN "size" SET DATA TYPE TEXT;

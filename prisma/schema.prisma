@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  avatar    String?
+  googleId  String?
+}
+
+model Settings {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  category    String   @default("general")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Visitor {
+  id                 String             @id @default(uuid())
+  email              String?            @unique
+  mobile             String?            @unique
+  name               String?
+  password           String?
+  registrationMethod String?
+  socialProvider     String?
+  socialProviderId   String?
+  verified           Boolean            @default(false)
+  verifiedAt         DateTime?
+  createdAt          DateTime           @default(now())
+  bookings           Booking[]
+  comments           Comment[]
+  verificationCodes  VerificationCode[]
+}
+
+model PropertyGalleryImage {
+  id         String   @id @default(uuid())
+  propertyId String
+  url        String
+  tag        String
+  uploadedAt DateTime @default(now())
+  property   Property @relation(fields: [propertyId], references: [id])
+}
+
+model Property {
+  id              String                 @id @default(uuid())
+  name            String
+  description     String
+  address         String
+  refNo           String                 @default("")
+  longitude       Float
+  latitude        Float
+  features        String[]               @default([])
+  price           Float                  @default(0)
+  status          String                 @default("active")
+  images          String[]               @default([])
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  guests          Int
+  rooms           String
+  size            String
+  bookings        Booking[]
+  comments        Comment[]
+  enquiryBookings EnquiryBooking[]
+  galleryImages   PropertyGalleryImage[]
+}
+
+model Booking {
+  id         String   @id @default(uuid())
+  propertyId String
+  visitorId  String
+  from       DateTime
+  to         DateTime
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  property   Property @relation(fields: [propertyId], references: [id])
+  visitor    Visitor  @relation(fields: [visitorId], references: [id])
+  payment    Payment?
+}
+
+model VerificationCode {
+  id        String   @id @default(uuid())
+  visitorId String
+  code      String
+  type      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  visitor   Visitor  @relation(fields: [visitorId], references: [id])
+}
+
+model Payment {
+  id        String      @id @default(uuid())
+  bookingId String      @unique
+  stripeId  String
+  amount    Float
+  status    String
+  type      PaymentType @default(INCOME)
+  createdAt DateTime    @default(now())
+  booking   Booking     @relation(fields: [bookingId], references: [id])
+}
+
+model Comment {
+  id         String        @id @default(uuid())
+  propertyId String
+  visitorId  String
+  content    String
+  rating     Int?
+  status     CommentStatus @default(PENDING)
+  reply      String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  property   Property      @relation(fields: [propertyId], references: [id])
+  visitor    Visitor       @relation(fields: [visitorId], references: [id])
+}
+
+model EnquiryBooking {
+  id            String               @id @default(uuid())
+  propertyId    String
+  firstName     String
+  lastName      String?
+  email         String
+  mobile        String
+  arrivalDate   String
+  departureDate String
+  adults        Int?
+  children      Int?
+  message       String?
+  status        EnquiryBookingStatus @default(PENDING)
+  createdAt     DateTime             @default(now())
+  property      Property             @relation(fields: [propertyId], references: [id])
+}
+
+enum PaymentType {
+  INCOME
+  REFUND
+  EXPENSE
+  MAINTENANCE
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EnquiryBookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}

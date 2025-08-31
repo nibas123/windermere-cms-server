@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "public"."Property" ALTER COLUMN "guests" DROP DEFAULT,
+ALTER COLUMN "rooms" DROP DEFAULT,
+ALTER COLUMN "size" DROP DEFAULT;
