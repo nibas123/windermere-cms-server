@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
 
 module.exports = async function (req, res, next) {
   const authHeader = req.header('Authorization');
-  console.log('Auth header:', authHeader); // DEBUG
+  // console.log('Auth header:', authHeader); // DEBUG
 
   let token = null;
 
@@ -20,7 +20,7 @@ module.exports = async function (req, res, next) {
         JWT_SECRET,
         { expiresIn: '7d' }
       );
-      console.log('No token provided, using first visitor from DB (development only)');
+      // console.log('No token provided, using first visitor from DB (development only)');
     } else {
       return res.status(401).json({ error: 'No token, authorization denied' });
     }
@@ -38,7 +38,7 @@ module.exports = async function (req, res, next) {
           JWT_SECRET,
           { expiresIn: '7d' }
         );
-        console.log('Placeholder token detected, using first visitor from DB (development only)');
+        // console.log('Placeholder token detected, using first visitor from DB (development only)');
       } else {
         return res.status(401).json({ error: 'Token variable not set. Please login and set the token variable in your API client.' });
       }
@@ -47,7 +47,7 @@ module.exports = async function (req, res, next) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log('Decoded JWT:', decoded); // DEBUG
+    // console.log('Decoded JWT:', decoded); // DEBUG
     if (decoded.role === 'visitor') {
       req.user = { visitorId: decoded.id, role: decoded.role };
     } else {
@@ -55,7 +55,7 @@ module.exports = async function (req, res, next) {
     }
     next();
   } catch (err) {
-    console.error('JWT verification error:', err); // DEBUG
+    // console.error('JWT verification error:', err); // DEBUG
     res.status(401).json({ error: 'Token is not valid', details: err.message });
   }
 }; 

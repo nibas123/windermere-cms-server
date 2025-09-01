@@ -1,5 +1,4 @@
 const prisma = require("../api/prisma");
-const path = require("path");
 const cloudinary = require("../services/cloudinary");
 
 exports.list = async () => {
@@ -19,14 +18,15 @@ exports.create = async (data, files) => {
     name,
     description,
     address,
+    nickname,
     refNo,
     features,
     price,
     longitude,
     latitude,
     guests,
-    size,
-    rooms,
+    bathrooms,
+    bedrooms
   } = data;
   price = parseFloat(price);
   guests = parseInt(guests);
@@ -40,6 +40,7 @@ exports.create = async (data, files) => {
   const property = await prisma.property.create({
     data: {
       name,
+      nickname,
       description,
       address,
       refNo,
@@ -49,8 +50,8 @@ exports.create = async (data, files) => {
       price,
       images,
       guests,
-      size,
-      rooms,
+      bathrooms,
+      bedrooms,
     },
     include: { bookings: true },
   });
@@ -65,6 +66,7 @@ exports.update = async (id, data, files) => {
     address,
     refNo,
     features,
+    nickname,
     status,
     size,
     guests,
@@ -76,6 +78,7 @@ exports.update = async (id, data, files) => {
   price = price !== undefined ? parseFloat(price) : undefined;
   let updateData = {};
   if (name !== undefined) updateData.name = name;
+  if (nickname !== undefined) updateData.nickname = nickname;
   if (description !== undefined) updateData.description = description;
   if (address !== undefined) updateData.address = address;
   if (refNo !== undefined) updateData.refNo = refNo;

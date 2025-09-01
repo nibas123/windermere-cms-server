@@ -5,6 +5,7 @@ const propertyService = require("../services/propertyService");
 
 exports.list = async (req, res) => {
   try {
+    // console.log("call reached")
     const properties = await propertyService.list();
     res.json(properties);
   } catch (err) {
@@ -38,6 +39,7 @@ exports.updateFeaturedImage = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
+  console.log(req.body)
   try {
     // Enforce exactly 4 images
     if (!req.files || req.files.length !== 4) {
@@ -59,6 +61,9 @@ exports.create = async (req, res) => {
       refNo,
       features,
       price,
+      nickname,
+      bedrooms,
+      bathrooms,
       longitude,
       latitude,
     } = req.body;
@@ -71,7 +76,11 @@ exports.create = async (req, res) => {
       longitude === undefined ||
       latitude === undefined ||
       !features ||
-      price === undefined
+      price === undefined ||
+      bedrooms === undefined ||
+      bathrooms === undefined ||
+      nickname === undefined
+
     ) {
       return res.status(400).json({ error: "Missing required fields" });
     }

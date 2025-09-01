@@ -58,6 +58,7 @@ model PropertyGalleryImage {
 model Property {
   id              String                 @id @default(uuid())
   name            String
+  nickname        String
   description     String
   address         String
   refNo           String                 @default("")
@@ -70,8 +71,8 @@ model Property {
   createdAt       DateTime               @default(now())
   updatedAt       DateTime               @updatedAt
   guests          Int
-  rooms           String
-  size            String
+  bedrooms        String
+  bathrooms       String
   bookings        Booking[]
   comments        Comment[]
   enquiryBookings EnquiryBooking[]
