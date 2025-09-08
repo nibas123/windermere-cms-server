@@ -27,6 +27,4 @@ router.use('/settings', settingsRouter);
 
 console.log('All routes registered successfully'); // Debug log
 
-// TODO: Add other routers (auth, properties, bookings, etc.)
-
 module.exports = router; 

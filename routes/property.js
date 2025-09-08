@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
 const upload = multer({ dest: path.join(__dirname, '../uploads') });
 
 // POST /api/properties expects: name, description, address, refNo, location: { longitude, latitude }, features: [], price, images (multipart)
-router.get('/', propertyController.list);
+router.get('/',auth, propertyController.list);
 router.get('/:id', propertyController.get);
 router.post('/', auth, upload.array('images'), propertyController.create);
 router.put('/:id', auth, upload.array('images'), propertyController.update);

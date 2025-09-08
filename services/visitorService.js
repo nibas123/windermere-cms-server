@@ -104,13 +104,13 @@ exports.socialRegister = async ({ socialProvider, socialProviderId, email, name 
 };
 
 exports.listAllVisitors = async () => {
-  const allVisitors = await prisma.visitor.findMany();
+  const allVisitors = await prisma.user.findMany();
   return allVisitors;
 };
 
 // Admin methods for visitor management
 exports.getVisitors = async () => {
-  return prisma.visitor.findMany({
+  return prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
   });
 };
@@ -122,7 +122,7 @@ exports.getVisitor = async (id) => {
 };
 
 exports.createVisitor = async (data) => {
-  return prisma.visitor.create({
+  return prisma.user.create({
     data: {
       name: data.name,
       email: data.email,

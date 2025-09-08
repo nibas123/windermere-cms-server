@@ -27,8 +27,8 @@ exports.list = async ({ status, propertyId }) => {
   if (status) where.status = status;
   if (propertyId) where.propertyId = propertyId;
   
-  console.log('CommentService.list - Filter params:', { status, propertyId });
-  console.log('CommentService.list - Where clause:', where);
+  // console.log('CommentService.list - Filter params:', { status, propertyId });
+  // console.log('CommentService.list - Where clause:', where);
   
   const comments = await prisma.comment.findMany({
     where,
@@ -36,8 +36,8 @@ exports.list = async ({ status, propertyId }) => {
     orderBy: { createdAt: 'desc' },
   });
   
-  console.log('CommentService.list - Found comments:', comments.length);
-  console.log('CommentService.list - Comment statuses:', comments.map(c => c.status));
+  // console.log('CommentService.list - Found comments:', comments.length);
+  // console.log('CommentService.list - Comment statuses:', comments.map(c => c.status));
   
   return comments;
 };

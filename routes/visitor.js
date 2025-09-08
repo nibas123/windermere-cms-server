@@ -12,7 +12,7 @@ router.post('/request-password-reset', visitorController.requestPasswordReset);
 router.post('/reset-password', visitorController.resetPassword);
 
 // Admin endpoints (require authentication)
-router.get('/', auth, visitorController.getVisitors);
+router.get('/', visitorController.getVisitors);
 router.get('/:id', auth, visitorController.getVisitor);
 router.post('/admin', auth, visitorController.createVisitor);
 router.put('/:id', auth, visitorController.updateVisitor);

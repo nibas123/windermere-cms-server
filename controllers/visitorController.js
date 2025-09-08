@@ -44,6 +44,7 @@ exports.socialRegister = async (req, res) => {
 exports.listAllVisitors = async (req, res) => {
   try {
     const visitors = await visitorService.listAllVisitors();
+    console.log(visitors,"++++++++++++++++++++++++++")
     res.json(visitors);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -82,8 +83,10 @@ exports.resetPassword = async (req, res) => {
 
 // Admin methods for visitor management
 exports.getVisitors = async (req, res) => {
+  console.log("++++++++++++++++++++HELO++++++++++++++++")
   try {
     const visitors = await visitorService.getVisitors();
+    console.log(visitors,"++++++++++++++++++++(((((((((((((((((++++++++++++++++++++")
     res.json(visitors);
   } catch (err) {
     res.status(500).json({ error: err.message });
