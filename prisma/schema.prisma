@@ -3,20 +3,36 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Wishlist {
+  id         String @id @default(uuid())
+  userId     String
+  propertyId String
+
+  user     User     @relation(fields: [userId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
+
+  @@unique([userId, propertyId])
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
+  id        String     @id @default(uuid())
+  slug      String     @unique @default(uuid())
+  email     String     @unique
+  name      String
   password  String
-  role      String   @default("admin")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  mobile    String?
+  address   String?
+  role      String     @default("admin")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   avatar    String?
   googleId  String?
+  wishlists Wishlist[]
 }
 
 model Settings {
@@ -71,12 +87,16 @@ model Property {
   createdAt       DateTime               @default(now())
   updatedAt       DateTime               @updatedAt
   guests          Int
+  pets            Int
+  pets_fee        Int
+  cleaning_fee    Int
   bedrooms        String
   bathrooms       String
   bookings        Booking[]
   comments        Comment[]
   enquiryBookings EnquiryBooking[]
   galleryImages   PropertyGalleryImage[]
+  wishlists       Wishlist[]
 }
 
 model Booking {
@@ -130,6 +150,7 @@ model Comment {
 model EnquiryBooking {
   id            String               @id @default(uuid())
   propertyId    String
+  enquiryId     String
   firstName     String
   lastName      String?
   email         String

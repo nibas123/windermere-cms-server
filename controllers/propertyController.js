@@ -57,6 +57,9 @@ exports.create = async (req, res) => {
     let {
       name,
       description,
+      cleaningfee,
+      petsNos,
+      petsfee,
       address,
       refNo,
       features,
@@ -67,6 +70,24 @@ exports.create = async (req, res) => {
       longitude,
       latitude,
     } = req.body;
+
+    console.log({
+      name,
+      description,
+      cleaningfee,
+      petsNos,
+      petsfee,
+      address,
+      refNo,
+      features,
+      price,
+      nickname,
+      bedrooms,
+      bathrooms,
+      longitude,
+      latitude,
+    })
+
     // console.log('DEBUG property create req.body:', req.body, 'typeof price:', typeof price);
     if (
       !name ||
@@ -80,7 +101,6 @@ exports.create = async (req, res) => {
       bedrooms === undefined ||
       bathrooms === undefined ||
       nickname === undefined
-
     ) {
       return res.status(400).json({ error: "Missing required fields" });
     }

@@ -13,23 +13,28 @@ exports.get = async (id) => {
 };
 
 exports.create = async (data, files) => {
-  console.log(data);
   let {
     name,
     description,
     address,
     nickname,
     refNo,
+    cleaningfee,
+    petsNos,
+    petsfee,
     features,
     price,
     longitude,
     latitude,
     guests,
     bathrooms,
-    bedrooms
+    bedrooms,
   } = data;
   price = parseFloat(price);
   guests = parseInt(guests);
+  cleaningfee = parseFloat(cleaningfee);
+  petsNos = parseFloat(petsNos);
+  petsfee = parseFloat(petsfee);
 
   let images = [];
   for (let i = 0; i < files.length; i++) {
@@ -52,6 +57,9 @@ exports.create = async (data, files) => {
       guests,
       bathrooms,
       bedrooms,
+      cleaning_fee: cleaningfee,
+      pets: petsNos,
+      pets_fee: petsfee,
     },
     include: { bookings: true },
   });
@@ -59,13 +67,16 @@ exports.create = async (data, files) => {
 };
 
 exports.update = async (id, data, files) => {
-  console.log(id, "poop");
+  console.log(data, "poop");
   let {
     name,
     description,
     address,
     refNo,
     features,
+    petsfee,
+    cleaningfee,
+    pets,
     nickname,
     status,
     size,
@@ -75,6 +86,7 @@ exports.update = async (id, data, files) => {
     longitude,
     latitude,
   } = data;
+
   price = price !== undefined ? parseFloat(price) : undefined;
   let updateData = {};
   if (name !== undefined) updateData.name = name;
@@ -82,6 +94,11 @@ exports.update = async (id, data, files) => {
   if (description !== undefined) updateData.description = description;
   if (address !== undefined) updateData.address = address;
   if (refNo !== undefined) updateData.refNo = refNo;
+
+  if (petsfee !== undefined) updateData.pets_fee = parseInt(petsfee);
+  if (pets !== undefined) updateData.pets = parseInt(pets);
+  if (cleaningfee !== undefined) updateData.cleaning_fee = parseInt(cleaningfee);
+
   if (longitude !== undefined) updateData.longitude = longitude;
   if (latitude !== undefined) updateData.latitude = latitude;
   if (features !== undefined) updateData.features = features;
@@ -266,8 +283,8 @@ exports.deletePropertyGalleryImageByUrl = async (propertyId, url) => {
   });
   if (!property) throw new Error("Property not found.");
 
-  if(property.images.length === 1){
-    throw new Error("Atleast one image is needed")
+  if (property.images.length === 1) {
+    throw new Error("Atleast one image is needed");
   }
 
   const index = property.images.indexOf(url);
