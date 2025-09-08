@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm dev",
-    "build": "npm build",
+    "build": "prisma generate",
     "start": "node api/server.js",
     "lint": "npm lint",
     "backend": "node api/server.js"
