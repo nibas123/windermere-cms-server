@@ -1,6 +1,6 @@
 const prisma = require("../api/prisma");
+const { uploadImage, STORAGE_PROVIDER } = require("../services/supabaseStorage");
 const cloudinary = require("../services/cloudinary");
-
 exports.list = async () => {
   return prisma.property.findMany({ include: { bookings: true } });
 };
@@ -38,8 +38,18 @@ exports.create = async (data, files) => {
 
   let images = [];
   for (let i = 0; i < files.length; i++) {
-    const result = await cloudinary.uploader.upload(files[i].path);
-    images.push(result.secure_url);
+    const file = files[i];
+    if (STORAGE_PROVIDER === 'supabase') {
+      const fileBuffer = require('fs').readFileSync(file.path);
+      const fileType = file.mimetype || 'image/jpeg';
+      const fileName = `${Date.now()}_${file.originalname}`;
+      const url = await uploadImage('property-images', fileName, fileBuffer, fileType);
+      images.push(url);
+    } else {
+      // Cloudinary fallback
+      const url = await uploadImage(null, null, null, null, file.path);
+      images.push(url);
+    }
   }
 
   const property = await prisma.property.create({
@@ -109,7 +119,22 @@ exports.update = async (id, data, files) => {
   if (rooms !== undefined) updateData.rooms = rooms;
   // If files are provided, replace images
   if (files && files.length > 0) {
-    updateData.images = files.map((f) => `/uploads/${f.filename}`);
+    const newImages = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (STORAGE_PROVIDER === 'supabase') {
+        const fileBuffer = require('fs').readFileSync(file.path);
+        const fileType = file.mimetype || 'image/jpeg';
+        const fileName = `${Date.now()}_${file.originalname}`;
+        const url = await uploadImage('property-images', fileName, fileBuffer, fileType);
+        newImages.push(url);
+      } else {
+        // Cloudinary fallback
+        const url = await uploadImage(null, null, null, null, file.path);
+        newImages.push(url);
+      }
+    }
+    updateData.images = newImages;
   }
   const property = await prisma.property.update({
     where: { id },
@@ -184,8 +209,18 @@ exports.uploadFeaturedImage = async (propertyId, files) => {
     let imgUrl = [...images];
 
     for (let i = 0; i < files.length; i++) {
-      const result = await cloudinary.uploader.upload(files[i].path);
-      imgUrl.push(result.secure_url);
+      const file = files[i];
+      if (STORAGE_PROVIDER === 'supabase') {
+        const fileBuffer = require('fs').readFileSync(file.path);
+        const fileType = file.mimetype || 'image/jpeg';
+        const fileName = `${Date.now()}_${file.originalname}`;
+        const url = await uploadImage('property-images', fileName, fileBuffer, fileType);
+        imgUrl.push(url);
+      } else {
+        // Cloudinary fallback
+        const url = await uploadImage(null, null, null, null, file.path);
+        imgUrl.push(url);
+      }
     }
 
     const updatedResponse = await prisma.property.update({
@@ -205,7 +240,18 @@ exports.uploadFeaturedImage = async (propertyId, files) => {
 
 exports.uploadImage = async (propertyId, file) => {
   if (!file) throw new Error("No file uploaded");
-  const url = `/uploads/${file.filename}`;
+  
+  let url;
+  if (STORAGE_PROVIDER === 'supabase') {
+    const fileBuffer = require('fs').readFileSync(file.path);
+    const fileType = file.mimetype || 'image/jpeg';
+    const fileName = `${Date.now()}_${file.originalname}`;
+    url = await uploadImage('property-images', fileName, fileBuffer, fileType);
+  } else {
+    // Cloudinary fallback
+    url = await uploadImage(null, null, null, null, file.path);
+  }
+  
   const property = await prisma.property.update({
     where: { id: propertyId },
     data: {
@@ -235,11 +281,21 @@ exports.addPropertyGalleryImages = async (propertyId, files, tags) => {
     const insertData = [];
 
     for (let i = 0; i < files.length; i++) {
-      // const file = files[i];
+      const file = files[i];
       const tag = tags[i];
-      const result = await cloudinary.uploader.upload(files[i].path);
-      const data = { tag, url: result.secure_url, propertyId };
-      insertData.push(data);
+      if (STORAGE_PROVIDER === 'supabase') {
+        const fileBuffer = require('fs').readFileSync(file.path);
+        const fileType = file.mimetype || 'image/jpeg';
+        const fileName = `${Date.now()}_${file.originalname}`;
+        const url = await uploadImage('property-gallery', fileName, fileBuffer, fileType);
+        const data = { tag, url, propertyId };
+        insertData.push(data);
+      } else {
+        // Cloudinary fallback
+        const url = await uploadImage(null, null, null, null, file.path);
+        const data = { tag, url, propertyId };
+        insertData.push(data);
+      }
     }
 
     const response = await prisma.propertyGalleryImage.createManyAndReturn({
