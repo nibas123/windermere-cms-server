@@ -8,16 +8,16 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Wishlist {
-  id         String @id @default(uuid())
-  userId     String
-  propertyId String
+// model Wishlist {
+//   id         String @id @default(uuid())
+//   userId     String
+//   propertyId String
 
-  user     User     @relation(fields: [userId], references: [id])
-  property Property @relation(fields: [propertyId], references: [id])
+//   user     User     @relation(fields: [userId], references: [id])
+//   property Property @relation(fields: [propertyId], references: [id])
 
-  @@unique([userId, propertyId])
-}
+//   @@unique([userId, propertyId], map: "wishlist_key")
+// }
 
 model User {
   id        String     @id @default(uuid())
@@ -32,7 +32,8 @@ model User {
   updatedAt DateTime   @updatedAt
   avatar    String?
   googleId  String?
-  wishlists Wishlist[]
+  comments           Comment[]
+
 }
 
 model Settings {
@@ -58,7 +59,6 @@ model Visitor {
   verifiedAt         DateTime?
   createdAt          DateTime           @default(now())
   bookings           Booking[]
-  comments           Comment[]
   verificationCodes  VerificationCode[]
 }
 
@@ -77,7 +77,7 @@ model Property {
   nickname        String
   description     String
   address         String
-  refNo           String                 @default("")
+  refNo           String                 @unique
   longitude       Float
   latitude        Float
   features        String[]               @default([])
@@ -96,7 +96,7 @@ model Property {
   comments        Comment[]
   enquiryBookings EnquiryBooking[]
   galleryImages   PropertyGalleryImage[]
-  wishlists       Wishlist[]
+  // wishlists       Wishlist[]
 }
 
 model Booking {
@@ -144,24 +144,32 @@ model Comment {
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
   property   Property      @relation(fields: [propertyId], references: [id])
-  visitor    Visitor       @relation(fields: [visitorId], references: [id])
+  visitor    User          @relation(fields: [visitorId], references: [id])
 }
 
 model EnquiryBooking {
   id            String               @id @default(uuid())
   propertyId    String
-  enquiryId     String
+  enquiryId     String?
   firstName     String
   lastName      String?
   email         String
+  userId        String
+  amount        Int
   mobile        String
   arrivalDate   String
   departureDate String
-  adults        Int?
-  children      Int?
+  teens         Int?                 @default(0)
+  infant        Int?                 @default(0)
+  adults        Int?                 @default(0)
+  children      Int?                 @default(0)
+  pets          Int?                 @default(0)
   message       String?
+  stripeId      String               @unique
   status        EnquiryBookingStatus @default(PENDING)
+  payment       PaymentStatus        @default(PENDING)
   createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
   property      Property             @relation(fields: [propertyId], references: [id])
 }
 
@@ -182,4 +190,10 @@ enum EnquiryBookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESSFUL
+  UNSUCCESSFUL
 }
