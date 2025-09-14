@@ -20,20 +20,19 @@ datasource db {
 // }
 
 model User {
-  id        String     @id @default(uuid())
-  slug      String     @unique @default(uuid())
-  email     String     @unique
+  id        String    @id @default(uuid())
+  slug      String    @unique @default(uuid())
+  email     String    @unique
   name      String
   password  String
   mobile    String?
   address   String?
-  role      String     @default("admin")
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  role      String    @default("admin")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   avatar    String?
   googleId  String?
-  comments           Comment[]
-
+  comments  Comment[]
 }
 
 model Settings {
@@ -147,6 +146,19 @@ model Comment {
   visitor    User          @relation(fields: [visitorId], references: [id])
 }
 
+model Enquiry {
+  id        String        @id @default(uuid())
+  name      String
+  email     String
+  mobile    String
+  subject   String
+  message   String
+  subscribe Boolean
+  status    EnquiryStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
 model EnquiryBooking {
   id            String               @id @default(uuid())
   propertyId    String
@@ -171,6 +183,11 @@ model EnquiryBooking {
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
   property      Property             @relation(fields: [propertyId], references: [id])
+}
+
+enum EnquiryStatus {
+  PENDING
+  REPLIED
 }
 
 enum PaymentType {
